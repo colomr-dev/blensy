@@ -1,6 +1,6 @@
 
 # blensy
-> Where life comes together
+> Yet another GTD (evolved) app
 
 A modular personal organization system with GTD methodology at its core, designed to help you blend all aspects of your life into a meaningful app.
 
