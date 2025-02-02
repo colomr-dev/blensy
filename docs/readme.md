@@ -1,5 +1,5 @@
 
-# blensy Documentation
+# blensy.app Documentation
 
 Welcome to the blensy documentation repository. This directory contains all the technical documentation, guides, and references for the project.
 
