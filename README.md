@@ -27,7 +27,7 @@ Currently in early alpha development. Core GTD functionality is the primary focu
 This project is currently in its initial planning phase. Contribution guidelines will be added soon.
 
 ## 📜 License
-[License to be defined]
+Apache-2.0 license
 
 ---
 > "Life is about creating pourpose."
