@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,7 +23,6 @@
     </div>
 
     <script type="module">
-        // Import config
         import { firebaseConfig } from './.config.js';
 
         // Initialize Firebase
@@ -34,16 +32,12 @@
         const uiConfig = {
             signInOptions: [
                 {
-                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    scopes: ['profile', 'email']
+                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID
                 },
                 {
                     provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                    requireDisplayName: true,
                     signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
-                    disableSignUp: {
-                        status: false
-                    }
+                    requireDisplayName: false  // No requerir nombre al hacer login
                 }
             ],
             signInFlow: 'popup',
@@ -61,8 +55,16 @@
         // Initialize UI
         const ui = new firebaseui.auth.AuthUI(firebase.auth());
         
-        // Start UI
-        ui.start('#firebaseui-auth-container', uiConfig);
+        // Check for existing session
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('user-signed-in').style.display = 'block';
+                document.getElementById('user-details').textContent = 
+                    JSON.stringify(user, null, 2);
+            } else {
+                ui.start('#firebaseui-auth-container', uiConfig);
+            }
+        });
 
         // Sign out handler
         document.getElementById('sign-out').addEventListener('click', () => {
@@ -71,18 +73,6 @@
                 document.getElementById('user-details').textContent = '';
                 ui.start('#firebaseui-auth-container', uiConfig);
             });
-        });
-
-        // Auth state observer
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('user-signed-in').style.display = 'block';
-                document.getElementById('user-details').textContent = 
-                    JSON.stringify(user, null, 2);
-            } else {
-                document.getElementById('user-signed-in').style.display = 'none';
-                document.getElementById('user-details').textContent = '';
-            }
         });
     </script>
 </body>
