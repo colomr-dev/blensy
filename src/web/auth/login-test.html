@@ -1,4 +1,4 @@
-i
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,16 +12,20 @@ i
 </head>
 <body>
     <h2>Blensy Auth Test - Local Environment</h2>
+    
+    <!-- Auth Container -->
     <div id="firebaseui-auth-container"></div>
+    
+    <!-- Signed In State -->
     <div id="user-signed-in" style="display:none">
-        <p>User is signed in!</p>
+        <h3>User Info</h3>
         <pre id="user-details"></pre>
         <button id="sign-out">Sign Out</button>
     </div>
 
     <script type="module">
         // Import config
-        import { firebaseConfig } from '.config.js';
+        import { firebaseConfig } from './.config.js';
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -29,18 +33,28 @@ i
         // Configure FirebaseUI
         const uiConfig = {
             signInOptions: [
-                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                firebase.auth.EmailAuthProvider.PROVIDER_ID
+                // Google Provider
+                {
+                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    scopes: ['profile', 'email']
+                },
+                // Email Provider
+                {
+                    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                    requireDisplayName: true,
+                    signInMethod: firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
+                }
             ],
-            signInSuccessUrl: 'http://my.blensy.app:8080/auth/callback',
             callbacks: {
                 signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                    // Show user info
                     document.getElementById('user-signed-in').style.display = 'block';
                     document.getElementById('user-details').textContent = 
                         JSON.stringify(authResult.user, null, 2);
-                    return false;
+                    return false; // Don't redirect
                 }
-            }
+            },
+            signInFlow: 'popup'
         };
 
         // Initialize UI
@@ -53,6 +67,20 @@ i
             document.getElementById('user-signed-in').style.display = 'none';
             document.getElementById('user-details').textContent = '';
             ui.start('#firebaseui-auth-container', uiConfig);
+        });
+
+        // Auth state observer
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                document.getElementById('user-signed-in').style.display = 'block';
+                document.getElementById('user-details').textContent = 
+                    JSON.stringify(user, null, 2);
+            } else {
+                // User is signed out
+                document.getElementById('user-signed-in').style.display = 'none';
+                document.getElementById('user-details').textContent = '';
+            }
         });
     </script>
 </body>
