@@ -3,3 +3,6 @@ dist/
 .env
 *.log
 .DS_Store
+
+# Auth configuration for login-test.html
+src/web/auth/.config.js
