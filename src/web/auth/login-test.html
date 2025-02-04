@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blensy Auth Test - Local Environment</title>
+    <!-- Firebase UI -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <h2>Blensy Auth Test - Local Environment</h2>
+    <div id="firebaseui-auth-container"></div>
+    <div id="user-signed-in" style="display:none">
+        <p>User is signed in!</p>
+        <pre id="user-details"></pre>
+        <button id="sign-out">Sign Out</button>
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDg74Qv0D6fKdBGDw1VazdcK6z9VYAI5-A",
+            authDomain: "my.blensy.app",
+            projectId: "blensy"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Configurar FirebaseUI
+        const uiConfig = {
+            signInOptions: [
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                firebase.auth.EmailAuthProvider.PROVIDER_ID
+            ],
+            signInSuccessUrl: 'http://my.blensy.app:8080/auth/callback',
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                    // Mostrar información del usuario
+                    document.getElementById('user-signed-in').style.display = 'block';
+                    document.getElementById('user-details').textContent = 
+                        JSON.stringify(authResult.user, null, 2);
+                    return false; // Prevenir redirect
+                }
+            }
+        };
+
+        // Inicializar UI
+        const ui = new firebaseui.auth.AuthUI(firebase.auth());
+        ui.start('#firebaseui-auth-container', uiConfig);
+
+        // Sign out handler
+        document.getElementById('sign-out').addEventListener('click', () => {
+            firebase.auth().signOut();
+            document.getElementById('user-signed-in').style.display = 'none';
+            document.getElementById('user-details').textContent = '';
+            ui.start('#firebaseui-auth-container', uiConfig);
+        });
+    </script>
+</body>
+</html>
