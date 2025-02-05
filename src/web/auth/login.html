@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Login | Dev #Test001</title>
+    <style>
+        .auth-container { margin: 20px; }
+        .auth-section { margin: 10px 0; }
+        #userInfo { display: none; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-section">
+            <button id="googleSignIn">Sign in with Google</button>
+        </div>
+
+        <div class="auth-section">
+            <h3>Email/Password</h3>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button id="emailSignIn">Sign In</button>
+            <button id="emailSignUp">Sign Up</button>
+        </div>
+
+        <div id="userInfo">
+            <h3>User Info</h3>
+            <pre id="userData"></pre>
+            <button id="signOut">Sign Out</button>
+        </div>
+    </div>
+    <script type="module" src="./auth.js"></script>
+</body>
+</html>
