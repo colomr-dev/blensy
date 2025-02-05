@@ -1,73 +1,58 @@
-import { initializeApp } from 'firebase/app';
+// Importamos las funciones necesarias de Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
 import { 
-    getAuth,
-    signInWithPopup,
-    GoogleAuthProvider,
-    createUserWithEmailAndPassword,
+    getAuth, 
     signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-} from 'firebase/auth';
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+} from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
 import { firebaseConfig } from './.config.js';
 
-// Initialize Firebase
+// Inicializamos Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
 
-// DOM Elements
-const googleBtn = document.getElementById('googleSignIn');
-const emailSignInBtn = document.getElementById('emailSignIn');
-const emailSignUpBtn = document.getElementById('emailSignUp');
-const signOutBtn = document.getElementById('signOut');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const userInfo = document.getElementById('userInfo');
-const userData = document.getElementById('userData');
-
-// Auth State Observer
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        userInfo.style.display = 'block';
-        userData.textContent = JSON.stringify(user, null, 2);
-    } else {
-        userInfo.style.display = 'none';
-        userData.textContent = '';
-    }
-});
-
-// Google Sign In
-googleBtn.addEventListener('click', async () => {
+// Función para iniciar sesión
+export const loginWithEmail = async (email, password) => {
+    console.log('Attempting login with:', email);
     try {
-        await signInWithPopup(auth, googleProvider);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('Login successful:', userCredential.user);
+        return { success: true, user: userCredential.user };
     } catch (error) {
-        console.error('Google sign in error:', error);
+        console.error('Login error:', error);
+        return { success: false, error: error.message };
     }
-});
+};
 
-// Email Sign In
-emailSignInBtn.addEventListener('click', async () => {
+// Función para registrar un nuevo usuario
+export const registerWithEmail = async (email, password) => {
+    console.log('Attempting registration with:', email);
     try {
-        await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log('Registration successful:', userCredential.user);
+        return { success: true, user: userCredential.user };
     } catch (error) {
-        console.error('Email sign in error:', error);
+        console.error('Registration error:', error);
+        return { success: false, error: error.message };
     }
-});
+};
 
-// Email Sign Up
-emailSignUpBtn.addEventListener('click', async () => {
-    try {
-        await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    } catch (error) {
-        console.error('Email sign up error:', error);
-    }
-});
-
-// Sign Out
-signOutBtn.addEventListener('click', async () => {
+// Función para cerrar sesión
+export const logout = async () => {
+    console.log('Attempting logout');
     try {
         await signOut(auth);
+        console.log('Logout successful');
+        return { success: true };
     } catch (error) {
-        console.error('Sign out error:', error);
+        console.error('Logout error:', error);
+        return { success: false, error: error.message };
     }
-});
+};
+
+// Función para observar cambios en el estado de autenticación
+export const onAuthStateChange = (callback) => {
+    return onAuthStateChanged(auth, callback);
+};

@@ -1,38 +1,208 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Blensy Auth - Test #002</title>
-        <!-- Añadir estas líneas -->
-        <script type="module">
-            import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
-            import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
-        </script>
-        <style>
-            .auth-container { margin: 20px; }
-            .auth-section { margin: 10px 0; }
-            #userInfo { display: none; }
-        </style>
-    </head> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Blensy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            margin-top: 1rem;
+            display: none;
+            padding: 0.5rem;
+            background-color: #ffe6e6;
+            border-radius: 4px;
+        }
+        #userInfo {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
 <body>
-    <div class="auth-container">
-        <div class="auth-section">
-            <button id="googleSignIn">Sign in with Google</button>
+    <div class="login-container">
+        <div id="loginForm">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button id="loginButton">Login</button>
+            <button id="registerButton">Register</button>
+            <div id="errorMessage" class="error-message"></div>
         </div>
-
-        <div class="auth-section">
-            <h3>Email/Password</h3>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
-            <button id="emailSignIn">Sign In</button>
-            <button id="emailSignUp">Sign Up</button>
-        </div>
-
+        
         <div id="userInfo">
-            <h3>User Info</h3>
-            <pre id="userData"></pre>
-            <button id="signOut">Sign Out</button>
+            <h3>Welcome!</h3>
+            <p id="userEmail"></p>
+            <button id="logoutButton">Logout</button>
         </div>
     </div>
-    <script type="module" src="./auth.js"></script>
+
+    <script type="module">
+        import { loginWithEmail, registerWithEmail, logout, onAuthStateChange } from './auth.js';
+
+        // Elementos del DOM
+        const loginForm = document.getElementById('loginForm');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        const errorMessage = document.getElementById('errorMessage');
+        const loginButton = document.getElementById('loginButton');
+        const registerButton = document.getElementById('registerButton');
+        const logoutButton = document.getElementById('logoutButton');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        // Función para mostrar error
+        const showError = (message) => {
+            console.error('Error:', message);
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        };
+
+        // Función para mostrar loading
+        const setLoading = (loading) => {
+            const buttons = [loginButton, registerButton, logoutButton];
+            buttons.forEach(button => {
+                if (button) {
+                    button.disabled = loading;
+                    button.classList.toggle('loading', loading);
+                }
+            });
+        };
+
+        // Login
+        loginButton.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            setLoading(true);
+            const result = await loginWithEmail(email, password);
+            setLoading(false);
+
+            if (!result.success) {
+                showError(result.error);
+            }
+        });
+
+        // Register
+        registerButton.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+
+            setLoading(true);
+            const result = await registerWithEmail(email, password);
+            setLoading(false);
+
+            if (!result.success) {
+                showError(result.error);
+            }
+        });
+
+        // Logout
+        logoutButton.addEventListener('click', async () => {
+            setLoading(true);
+            const result = await logout();
+            setLoading(false);
+
+            if (!result.success) {
+                showError(result.error);
+            }
+        });
+
+        // Observer de estado de autenticación
+        onAuthStateChange((user) => {
+            console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
+            if (user) {
+                // Usuario autenticado
+                loginForm.style.display = 'none';
+                userInfo.style.display = 'block';
+                userEmail.textContent = `Logged in as: ${user.email}`;
+                emailInput.value = '';
+                passwordInput.value = '';
+            } else {
+                // Usuario no autenticado
+                loginForm.style.display = 'block';
+                userInfo.style.display = 'none';
+                userEmail.textContent = '';
+            }
+        });
+
+        // Log para verificar que el script se cargó correctamente
+        console.log('Login script loaded successfully');
+    </script>
 </body>
 </html>
