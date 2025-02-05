@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Auth Login | Dev #Test001</title>
-    <style>
-        .auth-container { margin: 20px; }
-        .auth-section { margin: 10px 0; }
-        #userInfo { display: none; }
-    </style>
-</head>
+    <head>
+        <title>Blensy Auth - Test #002</title>
+        <!-- Añadir estas líneas -->
+        <script type="module">
+            import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
+            import { getAuth, signInWithPopup, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+        </script>
+        <style>
+            .auth-container { margin: 20px; }
+            .auth-section { margin: 10px 0; }
+            #userInfo { display: none; }
+        </style>
+    </head> 
 <body>
     <div class="auth-container">
         <div class="auth-section">
