@@ -4,5 +4,8 @@ dist/
 *.log
 .DS_Store
 
-# Auth configuration for login-test.html
+# Auth configuration for login.html
 src/web/auth/.config.js
+src/web/auth/config.js
+src/web/auth/.config.json
+src/web/auth/config.json
