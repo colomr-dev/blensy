@@ -1,0 +1,67 @@
+steps:
+  # Install dependencies
+  - name: 'node:20'
+    entrypoint: npm
+    args: ['install']
+
+  # Build the authentication frontend
+  - name: 'node:20'
+    entrypoint: npm
+    args: ['run', 'build']
+    dir: 'src/web/auth'
+
+  # Build and push the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:latest'
+      - './src/web/auth'
+      - '-f'
+      - './src/web/auth/Dockerfile'
+
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'auth-service'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '443'
+      - '--use-http2'
+      
+  # Map custom domain
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'domain-mappings'
+      - 'create'
+      - '--service=auth-service'
+      - '--domain=dev.auth.blensy.app'
+      - '--region=${_REGION}'
+      - '--force-override'
+
+substitutions:
+  _REGION: europe-southwest1  # Madrid region
+  _REPOSITORY: blensy-artifacts  # Default repository name
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:latest'
