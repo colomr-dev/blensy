@@ -1,20 +1,20 @@
-# Use the official nginx image as base
-FROM nginx:alpine
+# Usar la última versión LTS de Node.js
+FROM node:20-alpine
 
-# Install required packages for SSL
-RUN apk add --no-cache openssl
+# Crear directorio de la aplicación
+WORKDIR /usr/src/app
 
-# Create SSL directory
-RUN mkdir -p /etc/nginx/ssl
+# Copiar package.json y package-lock.json
+COPY package*.json ./
 
-# Copy the built files to nginx
-COPY . /usr/share/nginx/html/
+# Instalar dependencias
+RUN npm ci --only=production
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar el código fuente
+COPY . .
 
-# Expose port 443 for HTTPS
-EXPOSE 443
+# Exponer el puerto que usará la aplicación
+EXPOSE 8080
 
-# Start nginx in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Comando para ejecutar la aplicación
+CMD [ "node", "index.js" ]
