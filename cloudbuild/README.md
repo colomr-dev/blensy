@@ -2,7 +2,7 @@
 # Cloud Build Approach
 ## Pipeline by service and environment
 
-```
+```console
 /cloudbuild/
   /$service/
       ├── dev.yaml       # Development environment
@@ -15,7 +15,8 @@
 ```
   
 ## Cloud Build Orchestration
-```
+
+```console
 dev.yaml (Cloud Build)
     │
     ├── gcr.io/cloud-builders/docker (tool/builder)
@@ -28,6 +29,7 @@ dev.yaml (Cloud Build)
     │
     └── Result: custom-image
 ```
+
 
 The orchestration works as follows:
 
