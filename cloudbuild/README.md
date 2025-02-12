@@ -2,6 +2,7 @@
 # Cloud Build Approach
 ## Pipeline by service and environment
 
+```
 /cloudbuild/
   /$service/
       ├── dev.yaml       # Development environment
@@ -11,9 +12,10 @@
       |── dev.yaml       # Development environment
       ├── staging.yaml   # Staging or preproduction
       └── prod.yaml      # Main or production
+```
   
 ## Cloud Build Orchestration
-
+```
 dev.yaml (Cloud Build)
     │
     ├── gcr.io/cloud-builders/docker (tool/builder)
@@ -25,6 +27,7 @@ dev.yaml (Cloud Build)
     │                       └── node:20-alpine
     │
     └── Result: custom-image
+```
 
 The orchestration works as follows:
 
