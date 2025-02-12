@@ -30,8 +30,7 @@ dev.yaml (Cloud Build)
     └── Result: custom-image
 ```
 
-
-## orchestration workflow
+## Orchestration workflow
 
 1. Cloud Build reads the dev.yaml file
 2. Finds the step with name: `gcr.io/cloud-builders/docker`
