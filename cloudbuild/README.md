@@ -2,7 +2,7 @@
 # Cloud Build Approach
 ## Pipeline by service and environment
 
-```console
+```shell
 /cloudbuild/
   /$service/
       ├── dev.yaml       # Development environment
@@ -14,9 +14,9 @@
       └── prod.yaml      # Main or production
 ```
   
-## Cloud Build Orchestration
+# Cloud Build Orchestration
 
-```console
+```shell
 dev.yaml (Cloud Build)
     │
     ├── gcr.io/cloud-builders/docker (tool/builder)
