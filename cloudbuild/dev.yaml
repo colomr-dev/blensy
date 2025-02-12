@@ -1,67 +1,50 @@
 steps:
-  # Install dependencies
-  - name: 'node:20'
-    entrypoint: npm
-    args: ['install']
+  # Obtener variables de entorno desde Secret Manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "$$SECRET_ENV" > .env
+    secretEnv: ['SECRET_ENV']
 
-  # Build the authentication frontend
-  - name: 'node:20'
-    entrypoint: npm
-    args: ['run', 'build']
-    dir: 'src/web/auth'
-
-  # Build and push the container image
+  # Build de la imagen Docker
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
-      - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:latest'
-      - './src/web/auth'
-      - '-f'
-      - './src/web/auth/Dockerfile'
+    args: [
+      'build',
+      '-t', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/auth-service-dev/auth-service:$SHORT_SHA',
+      '-t', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/auth-service-dev/auth-service:latest',
+      '.'
+    ]
 
-  # Push the container image to Artifact Registry
+  # Push de la imagen al Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
+    args: [
+      'push',
+      'europe-southwest1-docker.pkg.dev/$PROJECT_ID/auth-service-dev/auth-service:$SHORT_SHA'
+    ]
 
-  # Deploy to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'auth-service'
-      - '--image'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
-      - '--region'
-      - '${_REGION}'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--port'
-      - '443'
-      - '--use-http2'
-      
-  # Map custom domain
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'domain-mappings'
-      - 'create'
-      - '--service=auth-service'
-      - '--domain=dev.auth.blensy.app'
-      - '--region=${_REGION}'
-      - '--force-override'
+  # Despliegue en Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run',
+      'deploy',
+      'auth-service-dev',
+      '--image', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/auth-service-dev/auth-service:$SHORT_SHA',
+      '--region', 'europe-southwest1',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--service-account', 'auth-service-dev@$PROJECT_ID.iam.gserviceaccount.com',
+      '--set-env-vars', 'ENVIRONMENT=development'
+    ]
 
-substitutions:
-  _REGION: europe-southwest1  # Madrid region
-  _REPOSITORY: blensy-artifacts  # Default repository name
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/auth-service-dev-env/versions/latest
+      env: 'SECRET_ENV'
 
-images:
-  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:$COMMIT_SHA'
-  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/auth-service:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamic_substitutions: true
+
+tags: ['dev', 'auth-service']
