@@ -12,8 +12,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
-      '-t', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
-      '-t', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:latest',
+      '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
+      '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:latest',
       '.'
     ]
 
@@ -21,7 +21,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push',
-      'europe-southwest1-docker.pkg.dev/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA'
+      '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA'
     ]
 
   # Despliegue en Cloud Run
@@ -30,8 +30,8 @@ steps:
       'run',
       'deploy',
       'auth-service-dev',
-      '--image', 'europe-southwest1-docker.pkg.dev/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
-      '--region', 'europe-southwest1',
+      '--image', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
+      '--region', '$_CLOUD_RUN_REGION',
       '--platform', 'managed',
       '--allow-unauthenticated',
       '--service-account', 'blensy-services-dev@$PROJECT_ID.iam.gserviceaccount.com',
@@ -48,3 +48,8 @@ options:
   dynamic_substitutions: true
 
 tags: ['dev', 'auth-service']
+
+# Valores por defecto para las variables personalizadas
+substitutions:
+  _CLOUD_RUN_REGION: 'europe-west1'
+  _ARTIFACT_REGISTRY_DOMAIN: 'europe-west1-docker.pkg.dev'
