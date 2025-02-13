@@ -9,13 +9,14 @@ steps:
     secretEnv: ['FIREBASE_CONFIG']
 
   # Build de la imagen Docker
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build',
-      '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
-      '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:latest',
-      '.'
-    ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'src/web/auth/Dockerfile',  # Ruta específica del Dockerfile
+    '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
+    '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:latest',
+    'src/web/auth'  # Contexto de build (directorio raíz para la construcción)
+  ]
 
   # Push de la imagen al Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
