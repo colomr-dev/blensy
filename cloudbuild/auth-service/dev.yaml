@@ -51,5 +51,5 @@ tags: ['dev', 'auth-service']
 
 # Valores por defecto para las variables personalizadas
 substitutions:
-  _CLOUD_RUN_REGION: 'europe-west1'
-  _ARTIFACT_REGISTRY_DOMAIN: 'europe-west1-docker.pkg.dev'
+  _CLOUD_RUN_REGION: 'europe-southwest1'
+  _ARTIFACT_REGISTRY_DOMAIN: 'europe-southwest1-docker.pkg.dev'
