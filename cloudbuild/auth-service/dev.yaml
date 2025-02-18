@@ -5,7 +5,7 @@ steps:
     args:
       - '-c'
       - |
-        echo "$$FIREBASE_CONFIG" > .env
+        echo "$$FIREBASE_CONFIG" | tee .env > /dev/null
     secretEnv: ['FIREBASE_CONFIG']
 
   # Paso 2: Construir la imagen Docker

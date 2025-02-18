@@ -1,20 +1,23 @@
-# Usar la última versión LTS de Node.js
-FROM node:20-alpine
+# Stage 1: Build the app (Opcional - si tienes un comando de build)
+FROM node:20-alpine AS build
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build # Si tienes un comando de build
 
-# Crear directorio de la aplicación
+# Stage 2: Create the final image
+FROM node:20-alpine
 WORKDIR /usr/src/app
 
-# Copiar package.json y package-lock.json
-COPY package*.json ./
+# Si usas multi-stage build:
+COPY --from=build /usr/src/app/dist ./ # Copia solo los archivos necesarios (adapta a tu build)
+COPY --from=build /usr/src/app/node_modules ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Si NO usas multi-stage build:
+# COPY package*.json ./
+# RUN npm ci --only=production
+# COPY . .  <- Esta línea se elimina para no copiar .env
 
-# Copiar el código fuente
-COPY . .
-
-# Exponer el puerto que usará la aplicación
 EXPOSE 8080
-
-# Comando para ejecutar la aplicación
 CMD [ "node", "index.js" ]
