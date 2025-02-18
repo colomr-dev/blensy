@@ -10,13 +10,13 @@ steps:
 
   # Paso 2: Construir la imagen Docker
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build',
-      '-f', 'src/web/auth/Dockerfile',
-      '-t', '${_ARTIFACT_REGISTRY_DOMAIN}/${PROJECT_ID}/blensy-artifacts-dev/auth-service/auth-service:${SHORT_SHA}',
-      '-t', '${_ARTIFACT_REGISTRY_DOMAIN}/${PROJECT_ID}/blensy-artifacts-dev/auth-service/auth-service:latest',
-      'src/web/auth'
-    ]
+  args: [
+    'build',
+    '-f', 'src/web/auth/Dockerfile',
+    '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:$SHORT_SHA',
+    '-t', '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:latest',
+    '.'  # Contexto de build en la raíz del repositorio
+  ]
 
   # Paso 3: Subir la imagen a Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
