@@ -19,7 +19,7 @@ steps:
     - '-t'
     - '$_ARTIFACT_REGISTRY_DOMAIN/$PROJECT_ID/blensy-artifacts-dev/auth-service/auth-service:latest'
     - '--build-arg'
-    - 'NODE_ENV=production'
+    - 'NODE_ENV=dev'
     - '.' # Contexto de build en la raíz del repositorio
 
   # Paso 3: Subir la imagen a Artifact Registry
